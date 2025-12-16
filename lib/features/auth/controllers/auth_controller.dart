@@ -5,6 +5,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:new_test_app/api.dart';
 import 'package:http/http.dart' as http;
+import 'package:new_test_app/features/auth/pages/login_page.dart';
 import 'dart:convert';
 
 import 'package:new_test_app/features/home_user/pages/home_wrapper_page.dart';
@@ -160,44 +161,55 @@ class AuthController extends GetxController {
 
   // Login
   Future<void> login() async {
-    // if (!validateLogin()) return;
+    if (!validateLogin()) return;
 
-    // isLoading.value = true;
-    Get.offAll(() => HomeWrapper());
+    isLoading.value = true;
 
-    // try {
-    //   final response = await http.post(
-    //     Uri.parse(Apis.login),
-    //     headers: {'Content-Type': 'application/json'},
-    //     body: jsonEncode({'phone': phone.value, 'password': password.value}),
-    //   );
+    try {
+      final response = await http.post(
+        Uri.parse(Apis.login),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({'mobile': phone.value, 'password': password.value}),
+      );
 
-    //   final data = jsonDecode(response.body);
+      final data = jsonDecode(response.body);
 
-    //   if (response.statusCode == 200) {
-    //     Get.rawSnackbar(
-    //       title: 'نجاح',
-    //       message: data['message'] ?? 'تم تسجيل الدخول بنجاح',
-    //       backgroundColor: Colors.green,
-    //     );
+      if (response.statusCode == 200) {
+        Get.rawSnackbar(
+          title: 'نجاح',
+          message: data['message'] ?? 'تم تسجيل الدخول بنجاح',
+          backgroundColor: Colors.green,
+        );
 
-    //         Get.offAll(() => HomeWrapper());
-
-    //   } else {
-    //     throw data['message'] ?? 'خطأ غير متوقع';
-    //   }
-    // } catch (e) {
-    //   Get.rawSnackbar(
-    //     title: 'خطأ',
-    //     message: e.toString(),
-    //     backgroundColor: Colors.red,
-    //   );
-    // } finally {
-    //   isLoading.value = false;
-    // }
-
+        Get.offAll(() => HomeWrapper());
+      } else {
+        throw data['message'] ?? 'خطأ غير متوقع';
+      }
+    } catch (e) {
+      Get.rawSnackbar(
+        title: 'خطأ',
+        message: e.toString(),
+        backgroundColor: Colors.red,
+      );
+    } finally {
+      isLoading.value = false;
+    }
   }
-  //
+
+  Map<String, String> get birthDateMap {
+    if (birthday.value == null) return {};
+
+    return {
+      'year_of_birth': birthday.value!.year.toString(),
+      'month_of_birth': birthday.value!.month.toString(),
+      'day_of_birth': birthday.value!.day.toString(),
+    };
+  }
+
+  String get apiRole {
+    return role.value == 'صاحب شقة' ? 'owner' : 'tenant';
+  }
+
   // Register
   Future<void> register() async {
     if (!validateRegister()) return;
@@ -207,42 +219,39 @@ class AuthController extends GetxController {
     try {
       final request = http.MultipartRequest('POST', Uri.parse(Apis.register));
 
+      /// TEXT FIELDS
       request.fields.addAll({
-        'first_name': firstName.value,
-        'last_name': lastName.value,
-        'phone': phone.value,
+        'firstname': firstName.value,
+        'lastname': lastName.value,
         'password': password.value,
-        'birthday': formattedBirthday ?? '',
-        'role': role.value,
+        'mobile': phone.value,
+        'role': apiRole,
+        ...birthDateMap,
       });
 
+      /// IMAGE FILE
       if (profileImage.value != null) {
         request.files.add(
-          await http.MultipartFile.fromPath(
-            'profile_image',
-            profileImage.value!.path,
-          ),
+          await http.MultipartFile.fromPath('image', profileImage.value!.path),
         );
       }
 
-      if (idImage.value != null) {
-        request.files.add(
-          await http.MultipartFile.fromPath('id_image', idImage.value!.path),
-        );
-      }
+      print(request.fields);
 
       final response = await request.send();
       final responseBody = await response.stream.bytesToString();
       final data = jsonDecode(responseBody);
 
-      if (response.statusCode == 201 || response.statusCode == 200) {
+      print(data);
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
         Get.rawSnackbar(
           title: 'نجاح',
           message: data['message'] ?? 'تم إنشاء الحساب بنجاح',
           backgroundColor: Colors.green,
         );
 
-        // Get.offAllNamed('/home');
+        Get.offAll(() => LoginPage());
       } else {
         throw data['message'] ?? 'فشل إنشاء الحساب';
       }

@@ -102,9 +102,8 @@ class LoginPage extends StatelessWidget {
                                   keyboardType: TextInputType.phone,
                                   textDirection: TextDirection.ltr,
                                   decoration: InputDecoration(
-                                    hintText: '9xxxxxxxx',
+                                    hintText: '09xxxxxxxx',
                                     hintTextDirection: TextDirection.ltr,
-                                    prefixText: '+963 ',
                                     prefixStyle: TextStyle(
                                       color: Colors.grey.shade700,
                                       fontWeight: FontWeight.w500,
