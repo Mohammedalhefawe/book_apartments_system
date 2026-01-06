@@ -15,14 +15,7 @@ class RegisterPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topRight,
-            end: Alignment.bottomLeft,
-            colors: [Colors.blue.shade50, Colors.white, Colors.teal.shade50],
-          ),
-        ),
+      body: SizedBox(
         child: SingleChildScrollView(
           child: Padding(
             padding: const EdgeInsets.all(20),

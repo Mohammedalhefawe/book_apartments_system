@@ -12,14 +12,7 @@ class LoginPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topRight,
-            end: Alignment.bottomLeft,
-            colors: [Colors.blue.shade50, Colors.white, Colors.teal.shade50],
-          ),
-        ),
+      body: SizedBox(
         child: Padding(
           padding: const EdgeInsets.all(20),
           child: Center(
@@ -186,7 +179,7 @@ class LoginPage extends StatelessWidget {
                                       if (value == null || value.isEmpty) {
                                         return 'كلمة المرور مطلوبة';
                                       }
-                                      if (value.length < 6) {
+                                      if (value.length < 3) {
                                         return 'كلمة المرور يجب أن تكون 6 أحرف على الأقل';
                                       }
                                       return null;

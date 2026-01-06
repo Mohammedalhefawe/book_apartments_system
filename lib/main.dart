@@ -1,10 +1,15 @@
+// main.dart
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:new_test_app/features/auth/pages/login_page.dart';
 import 'package:new_test_app/features/auth/pages/register_page.dart';
+import 'package:new_test_app/features/settings/controllers/settings_controller.dart';
+import 'package:new_test_app/translations/app_translations.dart';
 
-void main() {
+void main() async {
+  await GetStorage.init();
   runApp(const MyApp());
 }
 
@@ -13,34 +18,35 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GetMaterialApp(
-      title: 'تطبيق إدارة الشقق',
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(primarySwatch: Colors.blue, useMaterial3: true),
-      home: LoginPage(),
+    final SettingsController settingsController = Get.put(SettingsController());
 
-      // FIX: Use 'ar' instead of 'ar_SA'
-      locale: const Locale('ar'), // ← Changed from Locale('ar', 'SA')
+    return Obx(
+      () => GetMaterialApp(
+        title: 'تطبيق إدارة الشقق',
+        debugShowCheckedModeBanner: false,
+        theme: ThemeData.light(useMaterial3: true),
+        darkTheme: ThemeData.dark(useMaterial3: true),
+        themeMode: settingsController.themeMode.value,
+        translations: AppTranslations(), // ← Your translations
+        locale: settingsController.currentLocale.value,
+        supportedLocales: const [Locale('ar'), Locale('en', 'US')],
+        localizationsDelegates: const [
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+        ],
 
-      supportedLocales: const [
-        Locale('ar'), // Arabic (generic)
-        Locale('en', 'US'), // English
-      ],
+        home: LoginPage(),
+        getPages: [
+          GetPage(name: '/login', page: () => LoginPage()),
+          GetPage(name: '/register', page: () => RegisterPage()),
+        ],
 
-      // ADD: Required localization delegates
-      localizationsDelegates: const [
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-
-      // Optional: Better navigation routes
-      getPages: [
-        GetPage(name: '/login', page: () => LoginPage()),
-        GetPage(name: '/register', page: () => RegisterPage()),
-      ],
-
-      defaultTransition: Transition.rightToLeft,
+        defaultTransition:
+            settingsController.currentLocale.value.languageCode == 'ar'
+            ? Transition.rightToLeft
+            : Transition.leftToRight,
+      ),
     );
   }
 }

@@ -1,20 +1,20 @@
 import 'package:flutter/material.dart';
-import 'home_page.dart';
-import 'my_reservations_page.dart';
+import 'package:new_test_app/features/home_admin/pages/manage_apartment_page.dart';
+import 'package:new_test_app/features/home_admin/pages/manage_requests_page.dart';
 
-class HomeWrapper extends StatefulWidget {
-  const HomeWrapper({super.key});
+class HomeWrapperAdmin extends StatefulWidget {
+  const HomeWrapperAdmin({super.key});
 
   @override
-  State<HomeWrapper> createState() => _HomeWrapperState();
+  State<HomeWrapperAdmin> createState() => _HomeWrapperState();
 }
 
-class _HomeWrapperState extends State<HomeWrapper> {
+class _HomeWrapperState extends State<HomeWrapperAdmin> {
   int _selectedIndex = 0;
 
   final List<Widget> _pages = [
-    const HomePage(),
-    const MyReservationsPage(),
+    const AdminPendingUsersPage(),
+    const AdminPendingApartmentsPage(),
   ];
 
   void _onItemTapped(int index) {
@@ -35,11 +35,11 @@ class _HomeWrapperState extends State<HomeWrapper> {
         items: const [
           BottomNavigationBarItem(
             icon: Icon(Icons.home),
-            label: 'الرئيسية',
+            label: 'طلبات التسجيل',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.bookmark_border),
-            label: 'حجوزاتي',
+            icon: Icon(Icons.business_outlined),
+            label: 'الشقق المعلقة',
           ),
         ],
       ),

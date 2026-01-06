@@ -5,10 +5,13 @@ import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:new_test_app/api.dart';
 import 'package:http/http.dart' as http;
+import 'package:new_test_app/constant.dart';
 import 'package:new_test_app/features/auth/pages/login_page.dart';
+import 'package:new_test_app/features/home_admin/pages/home_wrapper_admin_page.dart';
+import 'package:new_test_app/features/home_owner/pages/home_wrapper_page.dart';
 import 'dart:convert';
 
-import 'package:new_test_app/features/home_user/pages/home_wrapper_page.dart';
+import 'package:new_test_app/features/home_tenant/pages/home_wrapper_page.dart';
 
 class AuthController extends GetxController {
   // Login
@@ -61,8 +64,8 @@ class AuthController extends GetxController {
     if (password.value.isEmpty) {
       passwordError.value = 'كلمة المرور مطلوبة';
       isValid = false;
-    } else if (password.value.length < 6) {
-      passwordError.value = 'كلمة المرور يجب أن تكون 6 أحرف على الأقل';
+    } else if (password.value.length < 3) {
+      passwordError.value = 'كلمة المرور يجب أن تكون 3 أحرف على الأقل';
       isValid = false;
     } else {
       passwordError.value = '';
@@ -181,7 +184,17 @@ class AuthController extends GetxController {
           backgroundColor: Colors.green,
         );
 
-        Get.offAll(() => HomeWrapper());
+        tokenUser = data['token'];
+        roleUser = data['role'];
+        if (roleUser == 'admin') {
+          Get.offAll(() => HomeWrapperAdmin());
+          return;
+        } else if (roleUser == 'owner') {
+          Get.offAll(() => HomeOwnerWrapper());
+          return;
+        } else if (roleUser == 'tenant') {
+          Get.offAll(() => HomeWrapper());
+        }
       } else {
         throw data['message'] ?? 'خطأ غير متوقع';
       }
@@ -233,6 +246,11 @@ class AuthController extends GetxController {
       if (profileImage.value != null) {
         request.files.add(
           await http.MultipartFile.fromPath('image', profileImage.value!.path),
+        );
+      }
+      if (idImage.value != null) {
+        request.files.add(
+          await http.MultipartFile.fromPath('pimage', idImage.value!.path),
         );
       }
 
